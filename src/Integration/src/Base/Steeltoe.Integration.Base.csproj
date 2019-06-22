@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\versions.props" />
+  
+  <PropertyGroup>
+    <Description>Steeltoe Integration Base</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Steeltoe.Integration</RootNamespace>
+    <AssemblyName>Steeltoe.Integration.Base</AssemblyName>
+    <PackageId>Steeltoe.Integration.Base</PackageId>
+    <PackageTags>Integration, ASPNET Core, Spring, Spring Cloud</PackageTags>
+  </PropertyGroup>
+  
+  <Import Project="..\..\..\..\sharedproject.props" />
+
+  <ItemGroup Condition="'$(CI_BUILD)' == ''">
+    <ProjectReference Include="..\Abstractions\Steeltoe.Integration.Abstractions.csproj" />
+    <ProjectReference Include="..\..\..\Messaging\src\Base\Steeltoe.Messaging.Base.csproj" />
+    <ProjectReference Include="..\..\..\Messaging\src\Abstractions\Steeltoe.Messaging.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CI_BUILD)' == 'True'">
+    <PackageReference Include="Steeltoe.Integration.Abstractions" Version="$(SteeltoeVersion)$(SteeltoeVersionSuffix)" />
+    <PackageReference Include="Steeltoe.Messaging.Base" Version="$(SteeltoeVersion)$(SteeltoeVersionSuffix)" />
+    <PackageReference Include="Steeltoe.Messaging.Abstractions" Version="$(SteeltoeVersion)$(SteeltoeVersionSuffix)" />
+  </ItemGroup>
+  
+</Project>

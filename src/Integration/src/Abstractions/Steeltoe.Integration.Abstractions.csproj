@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\versions.props" />
+  
+  <PropertyGroup>
+    <Description>Steeltoe Integration Abstractions</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Steeltoe.Integration</RootNamespace>
+    <AssemblyName>Steeltoe.Integration.Abstractions</AssemblyName>
+    <PackageId>Steeltoe.Integration.Abstractions</PackageId>
+    <PackageTags>Integration, ASPNET Core, Spring, Spring Cloud</PackageTags>
+  </PropertyGroup>
+  
+  <Import Project="..\..\..\..\sharedproject.props" />
+
+
+  <ItemGroup Condition="'$(CI_BUILD)' == ''">
+    <ProjectReference Include="..\..\..\Messaging\src\Abstractions\Steeltoe.Messaging.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CI_BUILD)' == 'True'">
+    <PackageReference Include="Steeltoe.Messaging.Abstractions" Version="$(SteeltoeVersion)$(SteeltoeVersionSuffix)" />
+  </ItemGroup>
+  
+</Project>

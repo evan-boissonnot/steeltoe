@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\versions.props" />
+
+  <PropertyGroup Condition="! $(OS.Contains('Win'))">
+    <TargetFrameworks>netcoreapp2.1;</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(OS.Contains('Win'))">
+    <TargetFrameworks>netcoreapp2.1</TargetFrameworks>
+    <!-- <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\steeltoe.snk</AssemblyOriginatorKeyFile> -->
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Steeltoe.Messaging.Test</RootNamespace>
+  </PropertyGroup>
+  <Import Project="..\..\..\..\sharedtest.props" />
+  
+  <Import Project="..\..\..\..\targetframework.props" />
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Base\Steeltoe.Messaging.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(ExtensionsVersion)" />
+  </ItemGroup>
+  
+
+</Project>

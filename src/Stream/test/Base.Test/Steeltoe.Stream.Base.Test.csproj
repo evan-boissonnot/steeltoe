@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\..\..\versions.props" />
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp2.2;</TargetFrameworks>
+    <RootNamespace>Steeltoe.Stream</RootNamespace>
+  </PropertyGroup>
+
+  <Import Project="..\..\..\..\sharedtest.props" />
+  <Import Project="..\..\..\..\targetframework.props" />
+  
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Base\Steeltoe.Stream.Base.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(ExtensionsVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="..\\TestBinder\\bin\\Debug\\netstandard2.0\\Steeltoe.Stream.TestBinder.dll">
+      <HintPath>..\\TestBinder\\bin\\Debug\\netstandard2.0\\Steeltoe.Stream.TestBinder.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+  
+</Project>

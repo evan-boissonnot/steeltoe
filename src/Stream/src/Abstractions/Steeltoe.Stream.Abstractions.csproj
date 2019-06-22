@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\..\..\versions.props" />
+  
+  <PropertyGroup>
+    <Description>Steeltoe Stream Abstractions</Description>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Steeltoe.Stream</RootNamespace>
+    <AssemblyName>Steeltoe.Stream.Abstractions</AssemblyName>
+    <PackageId>Steeltoe.Stream.Abstractions</PackageId>
+    <PackageTags>Streams, ASPNET Core, Spring, Spring Cloud</PackageTags>
+  </PropertyGroup>
+  
+  <Import Project="..\..\..\..\sharedproject.props" />
+
+  <ItemGroup Condition="'$(CI_BUILD)' == ''">
+    <ProjectReference Include="..\..\..\Messaging\src\Abstractions\Steeltoe.Messaging.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(CI_BUILD)' == 'True'">
+    <PackageReference Include="Steeltoe.Messaging.Abstractions" Version="$(SteeltoeVersion)$(SteeltoeVersionSuffix)" />
+  </ItemGroup>
+
+</Project>
