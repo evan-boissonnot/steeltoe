@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Configuration;
+using System;
 
-namespace Steeltoe.Common.Security
+namespace Steeltoe.Common
 {
-    public class CertificateOptions : ICertificateOptions
+    public interface ICertificateSource : IConfigurationSource
     {
-        public string Name { get; set; }
-
-        public X509Certificate2 Certificate { get; set; }
+        Type OptionsConfigurer { get; }
     }
 }

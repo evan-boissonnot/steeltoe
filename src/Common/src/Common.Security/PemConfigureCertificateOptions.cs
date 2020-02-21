@@ -15,15 +15,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.OpenSsl;
-using Org.BouncyCastle.Pkcs;
-using Org.BouncyCastle.Security;
-using Org.BouncyCastle.X509;
+using Steeltoe.Common.Options;
 using System;
-using System.IO;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using MS = System.Security.Cryptography.X509Certificates;
 
 namespace Steeltoe.Common.Security
 {
@@ -60,71 +56,41 @@ namespace Steeltoe.Common.Security
                 return;
             }
 
-            var certBytes = Encoding.Default.GetBytes(pemCert);
-            var keyBytes = Encoding.Default.GetBytes(pemKey);
-
-            X509Certificate cert = ReadCertificate(certBytes);
-            AsymmetricCipherKeyPair keys = ReadKeys(keyBytes);
-
-            var pfxBytes = CreatePfxContainer(cert, keys);
-            options.Certificate = new MS.X509Certificate2(pfxBytes);
+            options.Certificate = new X509Certificate2(Encoding.Default.GetBytes(pemCert)).CopyWithPrivateKey(ReadKeyFromString(pemKey));
         }
 
         public void Configure(CertificateOptions options)
         {
-            Configure(Options.DefaultName, options);
+            Configure(Microsoft.Extensions.Options.Options.DefaultName, options);
         }
 
-        internal byte[] CreatePfxContainer(X509Certificate cert, AsymmetricCipherKeyPair keys)
+        // https://stackoverflow.com/a/53439332/761468
+        private static RSA ReadKeyFromString(string pemContents)
         {
-            var certEntry = new X509CertificateEntry(cert);
+            const string RsaPrivateKeyHeader = "-----BEGIN RSA PRIVATE KEY-----";
+            const string RsaPrivateKeyFooter = "-----END RSA PRIVATE KEY-----";
 
-            var pkcs12Store = new Pkcs12StoreBuilder()
-                .SetUseDerEncoding(true)
-                .Build();
-            var keyEntry = new AsymmetricKeyEntry(keys.Private);
-            pkcs12Store.SetKeyEntry("ServerInstance", keyEntry, new X509CertificateEntry[] { certEntry });
+            if (pemContents.StartsWith(RsaPrivateKeyHeader))
+            {
+                var endIdx = pemContents.IndexOf(
+                    RsaPrivateKeyFooter,
+                    RsaPrivateKeyHeader.Length,
+                    StringComparison.Ordinal);
 
-            using (MemoryStream stream = new MemoryStream())
-            {
-                pkcs12Store.Save(stream, null, new SecureRandom());
-                var bytes = stream.ToArray();
-                return Pkcs12Utilities.ConvertToDefiniteLength(bytes);
-            }
-        }
+                var base64 = pemContents[RsaPrivateKeyHeader.Length..endIdx];
 
-        internal AsymmetricCipherKeyPair ReadKeys(byte[] keyBytes)
-        {
-            try
-            {
-                using (var reader = new StreamReader(new MemoryStream(keyBytes)))
-                {
-                    return new PemReader(reader).ReadObject() as AsymmetricCipherKeyPair;
-                }
-            }
-            catch (Exception e)
-            {
-                _logger?.LogError(e, "Unable to read PEM encoded keys");
+                var der = Convert.FromBase64String(base64);
+                var rsa = RSA.Create();
+                rsa.ImportRSAPrivateKey(der, out _);
+                return rsa;
             }
 
-            return null;
-        }
-
-        internal X509Certificate ReadCertificate(byte[] certBytes)
-        {
-            try
-            {
-                using (var reader = new StreamReader(new MemoryStream(certBytes)))
-                {
-                    return new PemReader(reader).ReadObject() as X509Certificate;
-                }
-            }
-            catch (Exception e)
-            {
-                _logger?.LogError(e, "Unable to read PEM encoded certificate");
-            }
-
-            return null;
+            // "BEGIN PRIVATE KEY" (ImportPkcs8PrivateKey),
+            // "BEGIN ENCRYPTED PRIVATE KEY" (ImportEncryptedPkcs8PrivateKey),
+            // "BEGIN PUBLIC KEY" (ImportSubjectPublicKeyInfo),
+            // "BEGIN RSA PUBLIC KEY" (ImportRSAPublicKey)
+            // could any/all be handled here.
+            throw new InvalidOperationException();
         }
     }
 }

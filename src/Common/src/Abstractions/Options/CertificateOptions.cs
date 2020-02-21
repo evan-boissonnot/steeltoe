@@ -14,12 +14,12 @@
 
 using System.Security.Cryptography.X509Certificates;
 
-namespace Steeltoe.Common.Security
+namespace Steeltoe.Common.Options
 {
-    public interface ICertificateOptions
+    public class CertificateOptions
     {
-        string Name { get; }
+        public string Name { get; set; }
 
-        X509Certificate2 Certificate { get; }
+        public X509Certificate2 Certificate { get; set; }
     }
 }
